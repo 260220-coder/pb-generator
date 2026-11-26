@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파워볼 번호 생성기</title>
+  <style>
+    :root {
+      --navy: #111827;
+      --blue: #2563eb;
+      --red: #ef4444;
+      --paper: #f8fafc;
+      --muted: #64748b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Inter, Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      color: var(--navy);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.12), transparent 25rem),
+        radial-gradient(circle at 85% 80%, rgba(239, 68, 68, 0.10), transparent 22rem),
+        #eef2ff;
+    }
+
+    .card {
+      width: min(680px, calc(100% - 32px));
+      margin: 24px 0;
+      padding: 36px;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+      backdrop-filter: blur(12px);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(26px, 5vw, 38px);
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      margin: 0 0 28px;
+      color: var(--muted);
+    }
+
+    .numbers {
+      min-height: 96px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 20px;
+      border-radius: 18px;
+      background: var(--paper);
+      border: 1px solid #e2e8f0;
+    }
+
+    .ball {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid #dbe3ef;
+      font-size: 21px;
+      font-weight: 800;
+      box-shadow: 0 5px 12px rgba(15, 23, 42, 0.10);
+    }
+
+    .ball.power {
+      color: white;
+      background: var(--red);
+      border-color: #dc2626;
+    }
+
+    button {
+      width: 100%;
+      margin: 18px 0 24px;
+      padding: 16px 20px;
+      border: 0;
+      border-radius: 14px;
+      color: white;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    button:hover { transform: translateY(-2px); box-shadow: 0 16px 28px rgba(37, 99, 235, 0.28); }
+    button:active { transform: translateY(0); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .stat {
+      padding: 18px;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+
+    .stat-label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 18px;
+      font-weight: 850;
+    }
+
+    .jackpot-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #fff7ed;
+      color: #9a3412;
+      font-size: 14px;
+    }
+
+    .jackpot-row input {
+      width: 150px;
+      margin-left: auto;
+      padding: 8px 10px;
+      border: 1px solid #fdba74;
+      border-radius: 8px;
+      background: white;
+      font: inherit;
+      font-weight: 700;
+    }
+
+    .note {
+      margin: 14px 2px 0;
+      color: #94a3b8;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 520px) {
+      .card { padding: 24px 18px; }
+      .ball { width: 49px; height: 49px; font-size: 18px; }
+      .stats { grid-template-columns: 1fr; }
+      .jackpot-row { align-items: flex-start; flex-direction: column; }
+      .jackpot-row input { width: 100%; margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>파워볼 번호 생성기</h1>
+    <p class="subtitle">행운의 5개 번호와 빨간 파워볼 하나를 생성하세요.</p>
+
+    <section class="numbers" id="numbers" aria-live="polite">
+      <span class="ball">--</span>
+      <span class="ball">--</span>
+      <span class="ball">--</span>
+      <span class="ball">--</span>
+      <span class="ball">--</span>
+      <span class="ball power">--</span>
+    </section>
+
+    <button id="generate" type="button">번호 생성하기</button>
+
+    <section class="stats" aria-label="당첨 확률과 기대값">
+      <article class="stat">
+        <span class="stat-label">1등 당첨 확률</span>
+        <strong class="stat-value">1 / 292,201,338</strong>
+      </article>
+      <article class="stat">
+        <span class="stat-label">티켓당 순 기대값</span>
+        <strong class="stat-value" id="expected-value">$0.00</strong>
+      </article>
+    </section>
+
+    <label class="jackpot-row">
+      <span>현재 1등 예상 상금</span>
+      <input id="jackpot" type="number" min="200" step="1000000" value="200" aria-label="현재 1등 예상 상금">
+      <span>백만 달러</span>
+    </label>
+
+    <p class="note">
+      기대값은 일반 등수 상금과 입력한 1등 상금을 바탕으로 계산한 추정치입니다.
+      티켓 가격은 2달러이며 분배 상금, 세금, 연금과 일시불 차이를 반영하지 않습니다.
+    </p>
+  </main>
+
+  <script>
+    const jackpotInput = document.queryElementById("jackpot");
+    const expectedValue = document.getElementById("expected-value");
+    const numbers = document.getElementById("numbers");
+    const generateButton = document.getElementById("generate");
+
+    function randomInt(max) {
+      if (window.crypto && window.crypto.getRandomValues) {
+        const limit = Math.floor(4294967296 / max) * max;
+        const values = new Uint32Array(1);
+        do window.crypto.getRandomValues(values); while (values[0] >= limit);
+        return values[0] % max;
+      }
+      return Math.floor(Math.random() * max);
+    }
+
+    function generateNumbers() {
+      const pool = Array.from({ length: 69 }, (_, index) => index + 1);
+      const whiteBalls = [];
+
+      for (let i = 0; i < 5; i++) {
+        const position = randomInt(pool.length);
+        whiteBalls.push(pool.splice(position, 1)[0]);
+      }
+
+      whiteBalls.sort((a, b) => a - b);
+      const powerBall = randomInt(26) + 1;
+
+      numbers.replaceChildren(
+        ...whiteBalls.map(number => {
+          const ball = document.createElement("span");
+          ball.className = "ball";
+          ball.textContent = number;
+          return ball;
+        }),
+        (() => {
+          const ball = document.createElement("span");
+          ball.className = "ball power";
+          ball.textContent = powerBall;
+          return ball;
+        })()
+      );
+    }
+
+    function calculateExpectedValue() {
+      const jackpotMillions = Math.max(200, Number(jackpotInput.value) || 200);
+      const jackpot = jackpotMillions * 1_000_000;
+
+      const prizes = [
+        [1 / 292201338, jackpot],
+        [1 / 11688053, 1_000_000],
+        [1 / 913129, 50_000],
+        [1 / 36525, 100],
+        [1 / 14494.11, 100],
+        [1 / 579.76, 7],
+        [1 / 701.33, 7],
+        [1 / 91.98, 4],
+        [1 / 38.32, 4]
+      ];
+
+      const gross = prizes.reduce((sum, [probability, prize]) => sum + probability * prize, 0);
+      const net = gross - 2;
+      expectedValue.textContent = `${net >= 0 ? "+" : "-"}$${Math.abs(net).toFixed(2)}`;
+    }
+
+    generateButton.addEventListener("click", generateNumbers);
+    jackpotInput.addEventListener("input", calculateExpectedValue);
+    calculateExpectedValue();
+  </script>
+</body>
+</html>
